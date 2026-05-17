@@ -27,6 +27,7 @@
 #include <QAction>
 #include <QInputDialog>
 #include <functional>
+#include <QRegularExpression>
 
 // ─────────────────────────────────────────────
 //  Constructor
