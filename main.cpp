@@ -1,3 +1,13 @@
-//
-// Created by 27091 on 2026/5/16.
-//
+#include <QApplication>
+#include "main_window.h"
+
+int main(int argc, char* argv[])
+{
+    QApplication app(argc, argv);
+    app.setApplicationName("Notepad");
+
+    MainWindow window;
+    window.show();
+
+    return app.exec();
+}
