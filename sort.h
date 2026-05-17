@@ -1,3 +1,6 @@
-//
-// Created by 27091 on 2026/5/16.
-//
+#pragma once
+#include <QString>
+
+namespace Sort {
+    QString sortLines(const QString& text, bool ascending = true);
+}
