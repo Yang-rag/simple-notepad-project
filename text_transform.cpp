@@ -23,5 +23,17 @@ namespace TextTransform {
         }
         return result;
     }
-
+    QString toSentenceCase(const QString& text) {
+        QString result = text.toLower();
+        bool newSentence = true;
+        for (int i = 0; i < result.size(); ++i) {
+            if (result[i] == '.' || result[i] == '!' || result[i] == '?') {
+                newSentence = true;
+            } else if (newSentence && !result[i].isSpace()) {
+                result[i] = result[i].toUpper();
+                newSentence = false;
+            }
+        }
+        return result;
+    }
 
