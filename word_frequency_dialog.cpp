@@ -19,3 +19,4 @@ WordFrequencyDialog::WordFrequencyDialog(const QString& text, QWidget* parent)
         QString word = it.next().captured().toLower();
         freq[word]++;
     }
+}
