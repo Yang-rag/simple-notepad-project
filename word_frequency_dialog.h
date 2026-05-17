@@ -1,8 +1,13 @@
-//
-// Created by 27091 on 2026/5/16.
-//
+#pragma once
+#include <QDialog>
 
-#ifndef SIMPLE_NOTEPAD_PROJECT_WORD_FREQUENCY_DIALOG_H
-#define SIMPLE_NOTEPAD_PROJECT_WORD_FREQUENCY_DIALOG_H
+namespace Ui { class WordFrequencyDialog; }
 
-#endif //SIMPLE_NOTEPAD_PROJECT_WORD_FREQUENCY_DIALOG_H
+class WordFrequencyDialog : public QDialog {
+    Q_OBJECT
+public:
+    explicit WordFrequencyDialog(const QString& text, QWidget* parent = nullptr);
+    ~WordFrequencyDialog();
+private:
+    Ui::WordFrequencyDialog* ui;
+};
