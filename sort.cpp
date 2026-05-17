@@ -1,4 +1,4 @@
-/#include "sort.h"
+#include "sort.h"
 #include <QStringList>
 #include <algorithm>
 
