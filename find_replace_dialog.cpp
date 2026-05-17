@@ -2,7 +2,7 @@
 #include "ui_find_replace_dialog.h"
 #include <QTextEdit>
 #include <QMessageBox>
- 
+
 FindReplaceDialog::FindReplaceDialog(QTextEdit* editor, QWidget* parent)
     : QDialog(parent), ui(new Ui::FindReplaceDialog), m_editor(editor)
 {
@@ -12,9 +12,9 @@ FindReplaceDialog::FindReplaceDialog(QTextEdit* editor, QWidget* parent)
     connect(ui->replaceAllBtn, &QPushButton::clicked, this, &FindReplaceDialog::replaceAll);
     connect(ui->closeBtn,      &QPushButton::clicked, this, &QDialog::accept);
 }
- 
+
 FindReplaceDialog::~FindReplaceDialog() { delete ui; }
- 
+
 void FindReplaceDialog::findNext()
 {
     QString term = ui->findEdit->text();
@@ -22,6 +22,7 @@ void FindReplaceDialog::findNext()
     if (!m_editor->find(term))
         QMessageBox::information(this, "Find", "No more occurrences found.");
 }
+
 void FindReplaceDialog::replace()
 {
     QString term = ui->findEdit->text();
