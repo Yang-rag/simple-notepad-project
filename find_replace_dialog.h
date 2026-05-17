@@ -1,8 +1,21 @@
-//
-// Created by 27091 on 2026/5/16.
-//
+#pragma once
+#include <QDialog>
 
-#ifndef SIMPLE_NOTEPAD_PROJECT_FIND_REPLACE_DIALOG_H
-#define SIMPLE_NOTEPAD_PROJECT_FIND_REPLACE_DIALOG_H
+namespace Ui { class FindReplaceDialog; }
+class QTextEdit;
 
-#endif //SIMPLE_NOTEPAD_PROJECT_FIND_REPLACE_DIALOG_H
+class FindReplaceDialog : public QDialog {
+    Q_OBJECT
+public:
+    explicit FindReplaceDialog(QTextEdit* editor, QWidget* parent = nullptr);
+    ~FindReplaceDialog();
+
+private slots:
+    void findNext();
+    void replace();
+    void replaceAll();
+
+private:
+    Ui::FindReplaceDialog* ui;
+    QTextEdit* m_editor;
+};
