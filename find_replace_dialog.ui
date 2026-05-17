@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>FindReplaceDialog</class>
+ <widget class="QDialog" name="FindReplaceDialog">
+  <property name="windowTitle">
+   <string>Find / Replace</string>
+  </property>
+  <property name="geometry">
+   <rect><x>0</x><y>0</y><width>400</width><height>160</height></rect>
+  </property>
+  <layout class="QVBoxLayout">
+   <item>
+    <layout class="QFormLayout">
+     <item row="0" column="0"><widget class="QLabel" name="label"><property name="text"><string>Find:</string></property></widget></item>
+     <item row="0" column="1"><widget class="QLineEdit" name="findEdit"/></item>
+     <item row="1" column="0"><widget class="QLabel" name="label2"><property name="text"><string>Replace:</string></property></widget></item>
+     <item row="1" column="1"><widget class="QLineEdit" name="replaceEdit"/></item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout">
+     <item><widget class="QPushButton" name="findNextBtn"><property name="text"><string>Find Next</string></property></widget></item>
+     <item><widget class="QPushButton" name="replaceBtn"><property name="text"><string>Replace</string></property></widget></item>
+     <item><widget class="QPushButton" name="replaceAllBtn"><property name="text"><string>Replace All</string></property></widget></item>
+     <item><widget class="QPushButton" name="closeBtn"><property name="text"><string>Close</string></property></widget></item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+</ui>

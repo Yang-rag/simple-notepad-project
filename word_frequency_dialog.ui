@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>WordFrequencyDialog</class>
+ <widget class="QDialog" name="WordFrequencyDialog">
+  <property name="windowTitle"><string>Word Frequency</string></property>
+  <property name="geometry">
+   <rect><x>0</x><y>0</y><width>320</width><height>400</height></rect>
+  </property>
+  <layout class="QVBoxLayout">
+   <item>
+    <widget class="QTableWidget" name="tableWidget">
+     <property name="columnCount"><number>2</number></property>
+     <attribute name="horizontalHeaderItem" column="0">
+      <item><property name="text"><string>Word</string></property></item>
+     </attribute>
+     <attribute name="horizontalHeaderItem" column="1">
+      <item><property name="text"><string>Count</string></property></item>
+     </attribute>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="closeBtn">
+     <property name="text"><string>Close</string></property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+</ui>
