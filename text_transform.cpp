@@ -36,4 +36,14 @@ namespace TextTransform {
         }
         return result;
     }
-
+    QString toSwapCase(const QString& text) {
+        QString result = text;
+        for (int i = 0; i < result.size(); ++i) {
+            if (result[i].isUpper())
+                result[i] = result[i].toLower();
+            else if (result[i].isLower())
+                result[i] = result[i].toUpper();
+        }
+        return result;
+    }
+}
