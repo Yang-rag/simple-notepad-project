@@ -1,8 +1,24 @@
-//
-// Created by 27091 on 2026/5/16.
-//
+#pragma once
+#include <QWidget>
 
-#ifndef SIMPLE_NOTEPAD_PROJECT_LINE_NUMBER_AREA_H
-#define SIMPLE_NOTEPAD_PROJECT_LINE_NUMBER_AREA_H
+class MainWindow;
 
-#endif //SIMPLE_NOTEPAD_PROJECT_LINE_NUMBER_AREA_H
+// A small widget painted on the left side of the editor showing line numbers.
+// It is a child widget of the editor's viewport parent (MainWindow).
+class LineNumberArea : public QWidget {
+    Q_OBJECT
+public:
+    explicit LineNumberArea(QWidget* editor, QWidget* parent = nullptr);
+
+    // Call this whenever the editor's document or scroll position changes
+    void update(int lineCount, int firstVisibleLine, int lineHeight, int topOffset);
+
+protected:
+    void paintEvent(QPaintEvent* event) override;
+
+private:
+    int m_lineCount      = 0;
+    int m_firstVisible   = 1;
+    int m_lineHeight     = 16;
+    int m_topOffset      = 0;
+};
