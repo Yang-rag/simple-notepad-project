@@ -40,28 +40,38 @@ QStringList SpellChecker::suggestions(const QString& word) const
 {
     QStringList result;
     std::string target = word.toLower().toStdString();
+    size_t tlen = target.size();
 
     for (const auto& w : m_words) {
         if (result.size() >= 5) break;
-        if (w.size() != target.size()) continue;
-        int diffs = 0;
-        for (size_t i = 0; i < w.size(); ++i) {
-            if (w[i] != target[i]) ++diffs;
-            if (diffs > 1) break;
-        }
-        if (diffs == 1)
-            result << QString::fromStdString(w);
-    }
 
-    if (result.size() < 5 && target.size() >= 3) {
-        std::string prefix = target.substr(0, 3);
-        auto it = m_words.lower_bound(prefix);
-        while (it != m_words.end() && result.size() < 5) {
-            if (it->substr(0, 3) != prefix) break;
-            QString candidate = QString::fromStdString(*it);
-            if (!result.contains(candidate) && candidate.toLower() != word.toLower())
-                result << candidate;
-            ++it;
+        if (w.size() == tlen) {
+            int diffs = 0;
+            for (size_t i = 0; i < tlen; ++i) {
+                if (w[i] != target[i]) ++diffs;
+                if (diffs > 1) break;
+            }
+            if (diffs == 1) {
+                result << QString::fromStdString(w);
+                continue;
+            }
+        }
+
+        if (w.size() == tlen + 1 || w.size() + 1 == tlen) {
+            const std::string& longer  = w.size() > tlen ? w : target;
+            const std::string& shorter = w.size() > tlen ? target : w;
+            int diffs = 0;
+            size_t i = 0, j = 0;
+            while (i < longer.size() && j < shorter.size()) {
+                if (longer[i] != shorter[j]) {
+                    ++diffs; ++i;
+                } else {
+                    ++i; ++j;
+                }
+                if (diffs > 1) break;
+            }
+            if (diffs <= 1)
+                result << QString::fromStdString(w);
         }
     }
 
