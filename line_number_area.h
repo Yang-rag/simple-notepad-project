@@ -3,14 +3,11 @@
 
 class MainWindow;
 
-// A small widget painted on the left side of the editor showing line numbers.
-// It is a child widget of the editor's viewport parent (MainWindow).
 class LineNumberArea : public QWidget {
     Q_OBJECT
 public:
     explicit LineNumberArea(QWidget* editor, QWidget* parent = nullptr);
 
-    // Call this whenever the editor's document or scroll position changes
     void update(int lineCount, int firstVisibleLine, int lineHeight, int topOffset);
 
 protected:

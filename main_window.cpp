@@ -29,13 +29,9 @@
 #include <functional>
 #include <QRegularExpression>
 
-// ─────────────────────────────────────────────
-//  Constructor
-// ─────────────────────────────────────────────
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
 {
-    // Central widget: line numbers + editor side by side
     QWidget* central = new QWidget(this);
     QHBoxLayout* hlay = new QHBoxLayout(central);
     hlay->setContentsMargins(0, 0, 0, 0);
@@ -54,21 +50,17 @@ MainWindow::MainWindow(QWidget* parent)
     setupToolBar();
     setupStatusBar();
 
-    // Load spell checker dictionary
     m_spellChecker = new SpellChecker(m_editor->document());
     if (!m_spellChecker->loadWordList("data/words.txt")) {
-        // Not fatal – spell check just won't highlight anything
         statusBar()->showMessage("Warning: could not load data/words.txt", 3000);
     }
 
-    // Wire up status-bar and line-number updates
     connect(m_editor, &QTextEdit::textChanged,       this, &MainWindow::updateStatusBar);
     connect(m_editor, &QTextEdit::cursorPositionChanged, this, &MainWindow::updateStatusBar);
     connect(m_editor->verticalScrollBar(), &QScrollBar::valueChanged,
             this, [this](int){ refreshLineNumbers(); });
     connect(m_editor, &QTextEdit::textChanged, this, &MainWindow::refreshLineNumbers);
 
-    // Context menu for spell suggestions
     m_editor->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(m_editor, &QTextEdit::customContextMenuRequested, this, [this](const QPoint& pos){
         QMenu* menu = m_editor->createStandardContextMenu();
@@ -96,7 +88,6 @@ MainWindow::MainWindow(QWidget* parent)
         delete menu;
     });
 
-    // Mark modified
     connect(m_editor->document(), &QTextDocument::modificationChanged,
             this, [this](bool mod){ m_modified = mod; updateTitle(); });
 
@@ -107,12 +98,8 @@ MainWindow::MainWindow(QWidget* parent)
     resize(900, 650);
 }
 
-// ─────────────────────────────────────────────
-//  Menu setup
-// ─────────────────────────────────────────────
 void MainWindow::setupMenus()
 {
-    // ── File ──
     QMenu* fileMenu = menuBar()->addMenu("&File");
     fileMenu->addAction("&New",       this, &MainWindow::newFile,  QKeySequence::New);
     fileMenu->addAction("&Open...",   this, &MainWindow::openFile, QKeySequence::Open);
@@ -125,7 +112,6 @@ void MainWindow::setupMenus()
     fileMenu->addSeparator();
     fileMenu->addAction("E&xit", this, &QWidget::close, QKeySequence::Quit);
 
-    // ── Edit ──
     QMenu* editMenu = menuBar()->addMenu("&Edit");
     editMenu->addAction("&Undo",       this, &MainWindow::undo,         QKeySequence::Undo);
     editMenu->addAction("&Redo",       this, &MainWindow::redo,         QKeySequence::Redo);
@@ -139,16 +125,13 @@ void MainWindow::setupMenus()
     editMenu->addAction("&Find / Replace...", this, &MainWindow::showFindReplace,   QKeySequence::Find);
     editMenu->addAction("&Word Frequency...", this, &MainWindow::showWordFrequency);
 
-    // ── Format ──
     QMenu* fmtMenu = menuBar()->addMenu("F&ormat");
     fmtMenu->addAction("&Bold",      this, &MainWindow::toggleBold,      QKeySequence::Bold);
     fmtMenu->addAction("&Italic",    this, &MainWindow::toggleItalic,    QKeySequence::Italic);
     fmtMenu->addAction("&Underline", this, &MainWindow::toggleUnderline, QKeySequence::Underline);
     fmtMenu->addSeparator();
 
-    // Optional feature 2: Font dialog
     fmtMenu->addAction("&Font...",       this, &MainWindow::showFontDialog);
-    // Optional feature 3: Color picker
     fmtMenu->addAction("Text &Color...", this, &MainWindow::showColorDialog);
     fmtMenu->addSeparator();
 
@@ -159,25 +142,19 @@ void MainWindow::setupMenus()
     caseMenu->addAction("Sentence case", this, &MainWindow::transformSentenceCase);
     caseMenu->addAction("sWAP cASE",     this, &MainWindow::transformSwapCase);
 
-    // ── View (optional feature 8: zoom) ──
     QMenu* viewMenu = menuBar()->addMenu("&View");
     viewMenu->addAction("Zoom &In",    this, &MainWindow::zoomIn,    QKeySequence(Qt::CTRL | Qt::Key_Equal));
     viewMenu->addAction("Zoom &Out",   this, &MainWindow::zoomOut,   QKeySequence(Qt::CTRL | Qt::Key_Minus));
     viewMenu->addAction("&Reset Zoom", this, &MainWindow::zoomReset, QKeySequence(Qt::CTRL | Qt::Key_0));
 
-    // ── Search ──
     QMenu* searchMenu = menuBar()->addMenu("&Search");
     searchMenu->addAction("&Find / Replace...", this, &MainWindow::showFindReplace, QKeySequence::Find);
 
-    // ── Tools ──
     QMenu* toolsMenu = menuBar()->addMenu("&Tools");
     toolsMenu->addAction("&Check Spelling...", this, &MainWindow::checkSpelling);
     toolsMenu->addAction("&Sort Lines...",      this, &MainWindow::showSortDialog);
 }
 
-// ─────────────────────────────────────────────
-//  Toolbar
-// ─────────────────────────────────────────────
 void MainWindow::setupToolBar()
 {
     QToolBar* tb = addToolBar("Format");
@@ -186,9 +163,6 @@ void MainWindow::setupToolBar()
     tb->addAction("U", this, &MainWindow::toggleUnderline);
 }
 
-// ─────────────────────────────────────────────
-//  Status bar  (words · lines · line:col)
-// ─────────────────────────────────────────────
 void MainWindow::setupStatusBar()
 {
     m_statusLabel = new QLabel(this);
@@ -204,7 +178,6 @@ void MainWindow::updateStatusBar()
     int lines = text.isEmpty() ? 0 : text.count('\n') + 1;
     m_statusLabel->setText(QString("Words: %1  Lines: %2").arg(words).arg(lines));
 
-    // Optional feature 1: cursor line / column
     QTextCursor cursor = m_editor->textCursor();
     int line = cursor.blockNumber() + 1;
     int col  = cursor.columnNumber() + 1;
@@ -213,9 +186,6 @@ void MainWindow::updateStatusBar()
     refreshLineNumbers();
 }
 
-// ─────────────────────────────────────────────
-//  Line numbers  (uses line_number_area)
-// ─────────────────────────────────────────────
 void MainWindow::setupLineNumbers() { /* wired in constructor */ }
 
 void MainWindow::refreshLineNumbers()
@@ -227,16 +197,12 @@ void MainWindow::refreshLineNumbers()
     QFontMetrics fm(m_editor->font());
     int lineH = fm.height() + 2;
 
-    // First visible line based on scroll position
     int scrollVal     = m_editor->verticalScrollBar()->value();
     int firstVisible  = scrollVal / (lineH > 0 ? lineH : 1) + 1;
 
     m_lineNumbers->update(totalLines, firstVisible, lineH, 0);
 }
 
-// ─────────────────────────────────────────────
-//  Title
-// ─────────────────────────────────────────────
 void MainWindow::updateTitle()
 {
     QString title = "Notepad";
@@ -247,9 +213,6 @@ void MainWindow::updateTitle()
     setWindowTitle(title);
 }
 
-// ─────────────────────────────────────────────
-//  File operations  (wrapped in try/catch)
-// ─────────────────────────────────────────────
 void MainWindow::newFile()
 {
     if (m_modified) {
@@ -316,9 +279,6 @@ void MainWindow::saveFileAs()
     saveFile();
 }
 
-// ─────────────────────────────────────────────
-//  Edit actions
-// ─────────────────────────────────────────────
 void MainWindow::undo()       { m_editor->undo(); }
 void MainWindow::redo()       { m_editor->redo(); }
 void MainWindow::cut()        { m_editor->cut(); }
@@ -338,9 +298,6 @@ void MainWindow::showWordFrequency()
     dlg.exec();
 }
 
-// ─────────────────────────────────────────────
-//  Rich text formatting
-// ─────────────────────────────────────────────
 void MainWindow::toggleBold()
 {
     QTextCharFormat fmt;
@@ -362,9 +319,6 @@ void MainWindow::toggleUnderline()
     m_editor->mergeCurrentCharFormat(fmt);
 }
 
-// ─────────────────────────────────────────────
-//  Optional feature 2: Font dialog
-// ─────────────────────────────────────────────
 void MainWindow::showFontDialog()
 {
     bool ok;
@@ -384,9 +338,6 @@ void MainWindow::showFontDialog()
     }
 }
 
-// ─────────────────────────────────────────────
-//  Optional feature 3: Color picker
-// ─────────────────────────────────────────────
 void MainWindow::showColorDialog()
 {
     QColor color = QColorDialog::getColor(m_editor->textColor(), this, "Select Text Color");
@@ -397,9 +348,6 @@ void MainWindow::showColorDialog()
     }
 }
 
-// ─────────────────────────────────────────────
-//  Optional feature 8: Zoom
-// ─────────────────────────────────────────────
 void MainWindow::zoomIn()
 {
     QFont f = m_editor->font();
@@ -426,9 +374,6 @@ void MainWindow::zoomReset()
     refreshLineNumbers();
 }
 
-// ─────────────────────────────────────────────
-//  Text case transforms
-// ─────────────────────────────────────────────
 void MainWindow::applyTransform(const std::function<QString(const QString&)>& fn)
 {
     QTextCursor cursor = m_editor->textCursor();
@@ -442,18 +387,12 @@ void MainWindow::transformCapitalize()  { applyTransform(TextTransform::toCapita
 void MainWindow::transformSentenceCase(){ applyTransform(TextTransform::toSentenceCase); }
 void MainWindow::transformSwapCase()    { applyTransform(TextTransform::toSwapCase); }
 
-// ─────────────────────────────────────────────
-//  Spell check (re-highlight whole document)
-// ─────────────────────────────────────────────
 void MainWindow::checkSpelling()
 {
     m_spellChecker->rehighlight();
     QMessageBox::information(this, "Spell Check", "Spell check complete.");
 }
 
-// ─────────────────────────────────────────────
-//  Sort lines
-// ─────────────────────────────────────────────
 void MainWindow::showSortDialog()
 {
     QStringList options = {"Ascending", "Descending"};

@@ -6,11 +6,9 @@
 SpellChecker::SpellChecker(QTextDocument* parent)
     : QSyntaxHighlighter(parent)
 {
-    // Red underline for misspelled words
     m_errorFormat.setUnderlineColor(Qt::red);
     m_errorFormat.setUnderlineStyle(QTextCharFormat::SpellCheckUnderline);
 
-    // Match sequences of alphabetic characters only
     m_wordPattern = QRegularExpression("[A-Za-z]+");
 }
 
@@ -31,7 +29,7 @@ bool SpellChecker::loadWordList(const QString& path)
 
 bool SpellChecker::isCorrect(const QString& word) const
 {
-    if (m_words.empty()) return true; // no dictionary loaded = no errors shown
+    if (m_words.empty()) return true;
     // Strip non-alpha characters, lowercase
     QString cleaned = word.toLower().remove(QRegularExpression("[^a-z]"));
     if (cleaned.isEmpty()) return true;
@@ -43,7 +41,6 @@ QStringList SpellChecker::suggestions(const QString& word) const
     QStringList result;
     std::string target = word.toLower().toStdString();
 
-    // Simple suggestion: find words that differ by at most 1 character (substitution)
     for (const auto& w : m_words) {
         if (result.size() >= 5) break;
         if (w.size() != target.size()) continue;
@@ -56,7 +53,6 @@ QStringList SpellChecker::suggestions(const QString& word) const
             result << QString::fromStdString(w);
     }
 
-    // If not enough, also try words with same first 3 chars
     if (result.size() < 5 && target.size() >= 3) {
         std::string prefix = target.substr(0, 3);
         auto it = m_words.lower_bound(prefix);

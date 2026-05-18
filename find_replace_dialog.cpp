@@ -33,7 +33,7 @@ void FindReplaceDialog::replace()
     if (cursor.hasSelection() && cursor.selectedText() == term) {
         cursor.insertText(repl);
     }
-    // Move to next occurrence
+
     if (!m_editor->find(term))
         QMessageBox::information(this, "Replace", "No more occurrences found.");
 }
@@ -44,7 +44,6 @@ void FindReplaceDialog::replaceAll()
     QString repl = ui->replaceEdit->text();
     if (term.isEmpty()) return;
 
-    // Start from beginning
     QTextCursor cursor = m_editor->textCursor();
     cursor.movePosition(QTextCursor::Start);
     m_editor->setTextCursor(cursor);

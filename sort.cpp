@@ -13,4 +13,4 @@ namespace Sort {
         return lines.join('\n');
     }
 
-} // namespace Sort
+}
