@@ -2,6 +2,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QTextDocument>
+#include <vector>
 
 SpellChecker::SpellChecker(QTextDocument* parent)
     : QSyntaxHighlighter(parent)
@@ -40,41 +41,39 @@ QStringList SpellChecker::suggestions(const QString& word) const
 {
     QStringList result;
     std::string target = word.toLower().toStdString();
-    size_t tlen = target.size();
 
+    // 只用一个策略：找所有和目标词开头字母相同的词
+    // 然后计算编辑距离，选最近的5个
+    char firstChar = target.empty() ? 0 : target[0];
+
+    // 计算两个字符串的编辑距离（Levenshtein distance）
+    auto editDistance = [](const std::string& a, const std::string& b) -> int {
+        int m = a.size(), n = b.size();
+        std::vector<std::vector<int>> dp(m+1, std::vector<int>(n+1));
+        for (int i = 0; i <= m; ++i) dp[i][0] = i;
+        for (int j = 0; j <= n; ++j) dp[0][j] = j;
+        for (int i = 1; i <= m; ++i)
+            for (int j = 1; j <= n; ++j)
+                dp[i][j] = a[i-1] == b[j-1]
+                    ? dp[i-1][j-1]
+                    : 1 + std::min({dp[i-1][j], dp[i][j-1], dp[i-1][j-1]});
+        return dp[m][n];
+    };
+
+    // 收集首字母相同、编辑距离<=2的词
+    std::vector<std::pair<int,std::string>> candidates;
     for (const auto& w : m_words) {
-        if (result.size() >= 5) break;
-
-        if (w.size() == tlen) {
-            int diffs = 0;
-            for (size_t i = 0; i < tlen; ++i) {
-                if (w[i] != target[i]) ++diffs;
-                if (diffs > 1) break;
-            }
-            if (diffs == 1) {
-                result << QString::fromStdString(w);
-                continue;
-            }
-        }
-
-
-        if (w.size() == tlen + 1 || w.size() + 1 == tlen) {
-            const std::string& longer  = w.size() > tlen ? w : target;
-            const std::string& shorter = w.size() > tlen ? target : w;
-            int diffs = 0;
-            size_t i = 0, j = 0;
-            while (i < longer.size() && j < shorter.size()) {
-                if (longer[i] != shorter[j]) {
-                    ++diffs; ++i;
-                } else {
-                    ++i; ++j;
-                }
-                if (diffs > 1) break;
-            }
-            if (diffs <= 1)
-                result << QString::fromStdString(w);
-        }
+        if (w.empty() || w[0] != firstChar) continue;
+        int dist = editDistance(target, w);
+        if (dist <= 2 && dist > 0)
+            candidates.push_back({dist, w});
     }
+
+    // 按编辑距离排序，距离小的排前面
+    std::sort(candidates.begin(), candidates.end());
+
+    for (int i = 0; i < std::min((int)candidates.size(), 5); ++i)
+        result << QString::fromStdString(candidates[i].second);
 
     return result;
 }
