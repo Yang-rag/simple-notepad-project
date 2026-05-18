@@ -19,7 +19,7 @@ void LineNumberArea::update(int lineCount, int firstVisibleLine,
     m_firstVisible = firstVisibleLine;
     m_lineHeight   = lineHeight > 0 ? lineHeight : 16;
     m_topOffset    = topOffset;
-    QWidget::update(); // trigger repaint
+    QWidget::update();
 }
 void LineNumberArea::paintEvent(QPaintEvent* event)
 {

@@ -31,7 +31,6 @@ bool SpellChecker::loadWordList(const QString& path)
 bool SpellChecker::isCorrect(const QString& word) const
 {
     if (m_words.empty()) return true;
-    // Strip non-alpha characters, lowercase
     QString cleaned = word.toLower().remove(QRegularExpression("[^a-z]"));
     if (cleaned.isEmpty()) return true;
     return m_words.count(cleaned.toStdString()) > 0;
@@ -53,7 +52,6 @@ QStringList SpellChecker::suggestions(const QString& word) const
                 dp[i][j] = a[i-1] == b[j-1]
                     ? dp[i-1][j-1]
                     : 1 + std::min({dp[i-1][j], dp[i][j-1], dp[i-1][j-1]});
-                // Damerau: 处理相邻字母互换，比如 wrold -> world
                 if (i > 1 && j > 1 && a[i-1] == b[j-2] && a[i-2] == b[j-1])
                     dp[i][j] = std::min(dp[i][j], dp[i-2][j-2] + 1);
             }
@@ -64,7 +62,7 @@ QStringList SpellChecker::suggestions(const QString& word) const
     for (const auto& w : m_words) {
         if (abs((int)w.size() - (int)target.size()) > 2) continue;
         int dist = editDistance(target, w);
-        if (dist == 1)  // 只要距离恰好为1的，最精准
+        if (dist == 1)
             candidates.push_back({dist, w});
     }
 
