@@ -19,8 +19,16 @@ void FindReplaceDialog::findNext()
 {
     QString term = ui->findEdit->text();
     if (term.isEmpty()) return;
-    if (!m_editor->find(term))
-        QMessageBox::information(this, "Find", "No more occurrences found.");
+
+    if (!m_editor->find(term)) {
+        QTextCursor cursor = m_editor->textCursor();
+        cursor.movePosition(QTextCursor::Start);
+        m_editor->setTextCursor(cursor);
+
+        if (!m_editor->find(term)) {
+            QMessageBox::information(this, "Find", "No occurrences found.");
+        }
+    }
 }
 
 void FindReplaceDialog::replace()
