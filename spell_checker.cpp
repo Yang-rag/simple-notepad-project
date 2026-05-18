@@ -68,7 +68,6 @@ QStringList SpellChecker::suggestions(const QString& word) const
             candidates.push_back({dist, w});
     }
 
-    // 如果距离1的不够5个，再找距离2的补充
     if (candidates.size() < 5) {
         for (const auto& w : m_words) {
             if (abs((int)w.size() - (int)target.size()) > 2) continue;
