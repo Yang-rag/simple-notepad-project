@@ -42,34 +42,43 @@ QStringList SpellChecker::suggestions(const QString& word) const
     QStringList result;
     std::string target = word.toLower().toStdString();
 
-    // 只用一个策略：找所有和目标词开头字母相同的词
-    // 然后计算编辑距离，选最近的5个
-    char firstChar = target.empty() ? 0 : target[0];
-
-    // 计算两个字符串的编辑距离（Levenshtein distance）
     auto editDistance = [](const std::string& a, const std::string& b) -> int {
         int m = a.size(), n = b.size();
+        if (abs(m - n) > 2) return 99;
         std::vector<std::vector<int>> dp(m+1, std::vector<int>(n+1));
         for (int i = 0; i <= m; ++i) dp[i][0] = i;
         for (int j = 0; j <= n; ++j) dp[0][j] = j;
         for (int i = 1; i <= m; ++i)
-            for (int j = 1; j <= n; ++j)
+            for (int j = 1; j <= n; ++j) {
                 dp[i][j] = a[i-1] == b[j-1]
                     ? dp[i-1][j-1]
                     : 1 + std::min({dp[i-1][j], dp[i][j-1], dp[i-1][j-1]});
+                // Damerau: 处理相邻字母互换，比如 wrold -> world
+                if (i > 1 && j > 1 && a[i-1] == b[j-2] && a[i-2] == b[j-1])
+                    dp[i][j] = std::min(dp[i][j], dp[i-2][j-2] + 1);
+            }
         return dp[m][n];
     };
 
-    // 收集首字母相同、编辑距离<=2的词
     std::vector<std::pair<int,std::string>> candidates;
     for (const auto& w : m_words) {
-        if (w.empty() || w[0] != firstChar) continue;
+        if (abs((int)w.size() - (int)target.size()) > 2) continue;
         int dist = editDistance(target, w);
-        if (dist <= 2 && dist > 0)
+        if (dist == 1)  // 只要距离恰好为1的，最精准
             candidates.push_back({dist, w});
     }
 
-    // 按编辑距离排序，距离小的排前面
+    // 如果距离1的不够5个，再找距离2的补充
+    if (candidates.size() < 5) {
+        for (const auto& w : m_words) {
+            if (abs((int)w.size() - (int)target.size()) > 2) continue;
+            int dist = editDistance(target, w);
+            if (dist == 2)
+                candidates.push_back({dist, w});
+            if (candidates.size() >= 20) break;
+        }
+    }
+
     std::sort(candidates.begin(), candidates.end());
 
     for (int i = 0; i < std::min((int)candidates.size(), 5); ++i)
