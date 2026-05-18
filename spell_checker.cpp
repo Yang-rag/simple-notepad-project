@@ -57,6 +57,7 @@ QStringList SpellChecker::suggestions(const QString& word) const
             }
         }
 
+
         if (w.size() == tlen + 1 || w.size() + 1 == tlen) {
             const std::string& longer  = w.size() > tlen ? w : target;
             const std::string& shorter = w.size() > tlen ? target : w;
